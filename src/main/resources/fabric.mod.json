@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "clientpowers",
+  "version": "${version}",
+  "name": "ClientPowers",
+  "description": "",
+  "authors": [],
+  "contact": {},
+  "license": "All-Rights-Reserved",
+  "icon": "assets/clientpowers/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "fabric-datagen": [
+      "net.pullolo.clientpowers.client.ClientpowersDataGenerator"
+    ],
+    "client": [
+      "net.pullolo.clientpowers.client.ClientpowersClient"
+    ],
+    "main": [
+      "net.pullolo.clientpowers.Clientpowers"
+    ]
+  },
+  "mixins": [
+    "clientpowers.mixins.json",
+    {
+      "config": "clientpowers.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric-api": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}
