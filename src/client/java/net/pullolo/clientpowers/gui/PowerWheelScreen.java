@@ -12,19 +12,20 @@ import org.lwjgl.glfw.GLFW;
 
 public class PowerWheelScreen extends Screen {
 
-    private static final int OUTER_RADIUS = 140;
+    private static final int OUTER_RADIUS = 150;
     private static final int INNER_RADIUS  = 52;
-    private static final int SEGMENT_W     = 63;
-    private static final int SEGMENT_H     = 34;
+    private static final int SEGMENT_W     = 60;
+    private static final int SEGMENT_H     = 32;
 
-    // Dodecagon layout: top = 90°, clockwise in 30° steps
+    // 13-segment layout: top = 90°, clockwise in 360/13° steps
     private static final Power[]  WHEEL_POWERS = {
             Power.FLAME, Power.THUNDER, Power.VOID, Power.FROST,
-            Power.STARGAZER, Power.OCEAN, Power.SHADOW, Power.NATURE,
-            Power.BLOOD, Power.WIND, Power.CRYSTAL, Power.LODESTAR
+            Power.STARGAZER, Power.OCEAN, Power.SHADOW, Power.NINJA,
+            Power.NATURE, Power.BLOOD, Power.WIND, Power.CRYSTAL, Power.LODESTAR
     };
     private static final double[] ANGLES = {
-            90, 60, 30, 0, 330, 300, 270, 240, 210, 180, 150, 120
+            90.00, 62.31, 34.62, 6.92, 339.23, 311.54, 283.85,
+            256.15, 228.46, 200.77, 173.08, 145.38, 117.69
     };
 
     private long  openTimeMs   = 0;
@@ -137,6 +138,7 @@ public class PowerWheelScreen extends Screen {
             case WIND       -> "zephyr rush";
             case CRYSTAL    -> "prism sight";
             case LODESTAR   -> "shard compass";
+            case NINJA      -> "silent strike";
             default         -> "";
         };
     }

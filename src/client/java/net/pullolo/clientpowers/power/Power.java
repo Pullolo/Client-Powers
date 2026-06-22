@@ -16,7 +16,8 @@ public enum Power {
     BLOOD      ("Blood",      0xFFC0392B, 0xFF8B0000),
     WIND       ("Wind",       0xFFAED6F1, 0xFFE8F8FF),
     CRYSTAL    ("Crystal",    0xFFF0E6FF, 0xFFFFFFFF),
-    LODESTAR   ("Lodestar",   0xFFF39C12, 0xFFFFD700);
+    LODESTAR   ("Lodestar",   0xFFF39C12, 0xFFFFD700),
+    NINJA      ("Ninja",      0xFF9E9E9E, 0xFF050508);
 
     public final String displayName;
     public final int accentColor;
@@ -42,6 +43,7 @@ public enum Power {
             case WIND       -> ParticleTypes.CLOUD;
             case CRYSTAL    -> ParticleTypes.ENCHANT;
             case LODESTAR   -> ParticleTypes.CRIT;
+            case NINJA      -> ParticleTypes.POOF;
             default         -> null;
         };
     }
@@ -60,6 +62,7 @@ public enum Power {
             case WIND       -> ParticleTypes.END_ROD;
             case CRYSTAL    -> ParticleTypes.NAUTILUS;
             case LODESTAR   -> ParticleTypes.GLOW;
+            case NINJA      -> ParticleTypes.ASH;
             default         -> null;
         };
     }
@@ -78,6 +81,7 @@ public enum Power {
             case WIND       -> ParticleTypes.CLOUD;
             case CRYSTAL    -> ParticleTypes.GLOW;
             case LODESTAR   -> ParticleTypes.NAUTILUS;
+            case NINJA      -> ParticleTypes.SMOKE;
             default         -> null;
         };
     }
@@ -96,6 +100,7 @@ public enum Power {
             case WIND       -> ParticleTypes.CLOUD;
             case CRYSTAL    -> ParticleTypes.ENCHANT;
             case LODESTAR   -> ParticleTypes.CRIT;
+            case NINJA      -> ParticleTypes.CRIT;
             default         -> null;
         };
     }

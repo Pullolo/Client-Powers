@@ -56,6 +56,12 @@ public class EntityMixin {
             return;
         }
 
+        // NINJA — Silent Strike: other players glow within 20 blocks
+        if (power == Power.NINJA && self instanceof PlayerEntity && distSq <= 20.0 * 20.0) {
+            cir.setReturnValue(true);
+            return;
+        }
+
         // Player Glow module: other players within configured range glow
         if (self instanceof PlayerEntity && PlayerGlowModule.INSTANCE.isEnabled()) {
             float range = PlayerGlowModule.INSTANCE.getRange();

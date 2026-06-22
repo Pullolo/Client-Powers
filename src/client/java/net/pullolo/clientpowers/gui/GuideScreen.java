@@ -10,7 +10,7 @@ import net.pullolo.clientpowers.power.PowerManager;
 public class GuideScreen extends Screen {
 
     private static final int PANEL_W   = 400;
-    private static final int PANEL_H   = 290;
+    private static final int PANEL_H   = 308;
     private static final int SIDEBAR_W = 120;
     private static final int PADDING   = 10;
     private static final int ROW_H     = 19;
@@ -18,7 +18,7 @@ public class GuideScreen extends Screen {
     private static final Power[] POWERS = {
         Power.FLAME, Power.FROST, Power.THUNDER, Power.VOID,
         Power.STARGAZER, Power.NATURE, Power.SHADOW, Power.OCEAN,
-        Power.BLOOD, Power.WIND, Power.CRYSTAL, Power.LODESTAR
+        Power.BLOOD, Power.WIND, Power.CRYSTAL, Power.LODESTAR, Power.NINJA
     };
 
     private Power selected     = Power.FLAME;
@@ -161,6 +161,7 @@ public class GuideScreen extends Screen {
             case WIND      -> "Zephyr Rush";
             case CRYSTAL   -> "Prism Sight";
             case LODESTAR  -> "Shard Compass";
+            case NINJA     -> "Silent Strike";
             default        -> "";
         };
     }
@@ -227,6 +228,11 @@ public class GuideScreen extends Screen {
                 "A compass points to the nearest",
                 "ore of any type within 16 blocks."
             };
+            case NINJA     -> new String[]{
+                "Sharpens your combat awareness.",
+                "Visual cues reveal crit windows,",
+                "threats behind you, and openings."
+            };
             default        -> new String[]{};
         };
     }
@@ -289,6 +295,13 @@ public class GuideScreen extends Screen {
                 "Ore compass (bottom-right corner)",
                 "Detects all ore types",
                 "Real-time updates (100 ms)"
+            };
+            case NINJA     -> new String[]{
+                "Players glow within 20 blocks",
+                "Crit window crosshair indicator",
+                "Hit direction edge bloom",
+                "Blind spot rear alert",
+                "Backstab angle tick marks"
             };
             default        -> new String[]{};
         };
