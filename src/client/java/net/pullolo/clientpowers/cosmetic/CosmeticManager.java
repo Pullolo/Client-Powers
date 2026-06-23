@@ -1,6 +1,6 @@
 package net.pullolo.clientpowers.cosmetic;
 
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 
 public class CosmeticManager {
     public static final CosmeticManager INSTANCE = new CosmeticManager();
@@ -10,7 +10,7 @@ public class CosmeticManager {
     private final TrailCosmetic    trail     = new TrailCosmetic();
     private final WingsRenderer    wings     = new WingsRenderer();
 
-    public void tick(MinecraftClient client) {
+    public void tick(Minecraft client) {
         boolean moving = isMoving(client);
         particles.tick(client, moving);
         aura.tick(client, moving);
@@ -22,11 +22,11 @@ public class CosmeticManager {
         trail.reset();
     }
 
-    private static boolean isMoving(MinecraftClient client) {
+    private static boolean isMoving(Minecraft client) {
         if (client.player == null) return false;
-        return client.options.forwardKey.isPressed()
-            || client.options.backKey.isPressed()
-            || client.options.leftKey.isPressed()
-            || client.options.rightKey.isPressed();
+        return client.options.keyUp.isDown()
+            || client.options.keyDown.isDown()
+            || client.options.keyLeft.isDown()
+            || client.options.keyRight.isDown();
     }
 }

@@ -1,24 +1,24 @@
 package net.pullolo.clientpowers.gui;
 
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 public final class RenderHelper {
     private RenderHelper() {}
 
-    public static void drawFilledCircle(DrawContext ctx, int cx, int cy, int r, int color) {
+    public static void drawFilledCircle(GuiGraphicsExtractor ctx, int cx, int cy, int r, int color) {
         for (int dy = -r; dy <= r; dy++) {
             int halfW = (int) Math.sqrt((double) r * r - (double) dy * dy);
             ctx.fill(cx - halfW, cy + dy, cx + halfW + 1, cy + dy + 1, color);
         }
     }
 
-    public static void drawCircleOutline(DrawContext ctx, int cx, int cy, int r, int thickness, int color) {
+    public static void drawCircleOutline(GuiGraphicsExtractor ctx, int cx, int cy, int r, int thickness, int color) {
         drawFilledCircle(ctx, cx, cy, r, color);
         drawFilledCircle(ctx, cx, cy, r - thickness, 0);
     }
 
     /** Draws a rounded rectangle using fill approximation. */
-    public static void drawRoundedRect(DrawContext ctx, int x, int y, int w, int h, int r, int color) {
+    public static void drawRoundedRect(GuiGraphicsExtractor ctx, int x, int y, int w, int h, int r, int color) {
         if (r <= 0) { ctx.fill(x, y, x + w, y + h, color); return; }
         r = Math.min(r, Math.min(w / 2, h / 2));
         // Center cross
@@ -32,7 +32,7 @@ public final class RenderHelper {
         fillCorner(ctx, x + w - r - 1, y + h - r - 1, r, color, false, false);
     }
 
-    private static void fillCorner(DrawContext ctx, int cx, int cy, int r, int color, boolean left, boolean up) {
+    private static void fillCorner(GuiGraphicsExtractor ctx, int cx, int cy, int r, int color, boolean left, boolean up) {
         for (int dy = 0; dy <= r; dy++) {
             int halfW = (int) Math.sqrt((double) r * r - (double) dy * dy);
             int y1 = up ? cy - dy : cy + dy;
@@ -42,13 +42,13 @@ public final class RenderHelper {
         }
     }
 
-    public static void drawRoundedRectOutline(DrawContext ctx, int x, int y, int w, int h, int r, int thickness, int color) {
+    public static void drawRoundedRectOutline(GuiGraphicsExtractor ctx, int x, int y, int w, int h, int r, int thickness, int color) {
         for (int t = 0; t < thickness; t++) {
             drawRoundedRectHollow(ctx, x + t, y + t, w - 2 * t, h - 2 * t, Math.max(0, r - t), color);
         }
     }
 
-    private static void drawRoundedRectHollow(DrawContext ctx, int x, int y, int w, int h, int r, int color) {
+    private static void drawRoundedRectHollow(GuiGraphicsExtractor ctx, int x, int y, int w, int h, int r, int color) {
         // Top and bottom bars
         ctx.fill(x + r, y, x + w - r, y + 1, color);
         ctx.fill(x + r, y + h - 1, x + w - r, y + h, color);
@@ -62,7 +62,7 @@ public final class RenderHelper {
         drawArcOutline(ctx, x + w - r - 1, y + h - r - 1, r, color, false, false);
     }
 
-    private static void drawArcOutline(DrawContext ctx, int cx, int cy, int r, int color, boolean left, boolean up) {
+    private static void drawArcOutline(GuiGraphicsExtractor ctx, int cx, int cy, int r, int color, boolean left, boolean up) {
         for (int angle = 0; angle <= 90; angle += 2) {
             double rad = Math.toRadians(angle);
             int dx = (int) Math.round(Math.cos(rad) * r);
@@ -73,7 +73,7 @@ public final class RenderHelper {
         }
     }
 
-    public static void drawToggle(DrawContext ctx, int x, int y, boolean on, int accentColor) {
+    public static void drawToggle(GuiGraphicsExtractor ctx, int x, int y, boolean on, int accentColor) {
         int bg = on ? accentColor : 0xFF333333;
         drawRoundedRect(ctx, x, y, 30, 16, 8, bg);
         int dotX = on ? x + 16 : x + 2;

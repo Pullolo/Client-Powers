@@ -1,7 +1,7 @@
 package net.pullolo.clientpowers.cosmetic;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.particle.ParticleEffect;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.particles.ParticleOptions;
 import net.pullolo.clientpowers.config.Config;
 import net.pullolo.clientpowers.power.Power;
 import net.pullolo.clientpowers.power.PowerManager;
@@ -23,11 +23,10 @@ public class WingsRenderer {
         {0.35f, 1.00f},
     };
 
-    public void tick(MinecraftClient client, boolean moving) {
-        if (client.player == null || client.world == null) return;
+    public void tick(Minecraft client, boolean moving) {
+        if (client.player == null || client.level == null) return;
         if (!shouldRender()) return;
 
-        // Always advance so flap phase is continuous when player stops
         tick++;
         flapAngle += 0.10;
 
@@ -35,15 +34,15 @@ public class WingsRenderer {
         if (tick % 2 != 0) return;
 
         Power power = PowerManager.INSTANCE.getActivePower();
-        ParticleEffect particle = power.getBodyParticle();
+        ParticleOptions particle = power.getBodyParticle();
         if (particle == null) return;
 
         double px = client.player.getX();
         double py = client.player.getY();
         double pz = client.player.getZ();
 
-        float cosYaw = (float) Math.cos(Math.toRadians(client.player.getYaw()));
-        float sinYaw = (float) Math.sin(Math.toRadians(client.player.getYaw()));
+        float cosYaw = (float) Math.cos(Math.toRadians(client.player.getYRot()));
+        float sinYaw = (float) Math.sin(Math.toRadians(client.player.getYRot()));
 
         double flapOffset = Math.sin(flapAngle) * 0.25;
 
@@ -55,7 +54,7 @@ public class WingsRenderer {
         }
     }
 
-    private void spawnWingParticle(MinecraftClient client, ParticleEffect particle,
+    private void spawnWingParticle(Minecraft client, ParticleOptions particle,
                                     double px, double py, double pz,
                                     float cosYaw, float sinYaw,
                                     double side, double height) {
@@ -63,7 +62,7 @@ public class WingsRenderer {
         double oz = (RANDOM.nextDouble() - 0.5) * 0.05;
         double wx = side * cosYaw + ox;
         double wz = side * sinYaw + oz;
-        client.world.addParticleClient(particle, px + wx, py + height, pz + wz - 0.1, 0.0, 0.003, 0.0);
+        client.level.addParticle(particle, px + wx, py + height, pz + wz - 0.1, 0.0, 0.003, 0.0);
     }
 
     public boolean shouldRender() {

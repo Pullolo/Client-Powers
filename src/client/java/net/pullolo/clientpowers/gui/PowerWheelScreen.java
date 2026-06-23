@@ -1,10 +1,10 @@
 package net.pullolo.clientpowers.gui;
 
-import net.minecraft.client.gui.Click;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.input.KeyInput;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.KeyEvent;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.network.chat.Component;
 import net.pullolo.clientpowers.cosmetic.CosmeticManager;
 import net.pullolo.clientpowers.power.Power;
 import net.pullolo.clientpowers.power.PowerManager;
@@ -17,7 +17,6 @@ public class PowerWheelScreen extends Screen {
     private static final int SEGMENT_W     = 60;
     private static final int SEGMENT_H     = 32;
 
-    // 13-segment layout: top = 90°, clockwise in 360/13° steps
     private static final Power[]  WHEEL_POWERS = {
             Power.FLAME, Power.THUNDER, Power.VOID, Power.FROST,
             Power.STARGAZER, Power.OCEAN, Power.SHADOW, Power.NINJA,
@@ -32,7 +31,7 @@ public class PowerWheelScreen extends Screen {
     private Power hoveredPower = null;
 
     public PowerWheelScreen() {
-        super(Text.literal("Power Wheel"));
+        super(Component.literal("Power Wheel"));
     }
 
     @Override
@@ -41,25 +40,22 @@ public class PowerWheelScreen extends Screen {
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+    public void extractRenderState(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
         int cx = width / 2;
         int cy = height / 2;
 
         float openProgress = Math.min(1f, (System.currentTimeMillis() - openTimeMs) / 300f);
         float eased = smoothstep(openProgress);
 
-        // Dark background overlay
         context.fill(0, 0, width, height, (int)(140 * eased) << 24);
 
         updateHover(mouseX, mouseY, cx, cy);
 
-        // Center circle
         RenderHelper.drawFilledCircle(context, cx, cy, INNER_RADIUS,
                 ((int)(210 * eased) << 24) | 0x0D0D0D);
 
         Power activePower = PowerManager.INSTANCE.getActivePower();
 
-        // Center text
         if (eased > 0.4f) {
             int textAlpha = (int)(255 * ((eased - 0.4f) / 0.6f));
             Power display  = hoveredPower != null ? hoveredPower : activePower;
@@ -67,19 +63,18 @@ public class PowerWheelScreen extends Screen {
             String hint    = display != Power.NONE ? getHint(display) : "";
             int accent     = display.accentColor;
 
-            context.drawCenteredTextWithShadow(textRenderer, name, cx,
+            context.centeredText(font, name, cx,
                     cy - (hint.isEmpty() ? 4 : 7), RenderHelper.withAlpha(accent, textAlpha));
             if (!hint.isEmpty()) {
-                context.drawCenteredTextWithShadow(textRenderer, hint, cx, cy + 2,
+                context.centeredText(font, hint, cx, cy + 2,
                         RenderHelper.withAlpha(0xFFAAAAAA, textAlpha * 2 / 3));
             }
 
             String instruct = hoveredPower != null ? "Release R to select" : "Release R to clear";
-            context.drawCenteredTextWithShadow(textRenderer, instruct, cx,
+            context.centeredText(font, instruct, cx,
                     cy + INNER_RADIUS + 7, RenderHelper.withAlpha(0xFF888888, textAlpha * 2 / 3));
         }
 
-        // Connector line from circle edge to hovered segment
         if (hoveredPower != null && eased > 0.3f) {
             double rad     = Math.toRadians(getAngle(hoveredPower));
             int lineAlpha  = (int)(90 * eased);
@@ -91,7 +86,6 @@ public class PowerWheelScreen extends Screen {
                     (lineAlpha << 24) | (hoveredPower.accentColor & 0x00FFFFFF));
         }
 
-        // Power segments
         for (int i = 0; i < WHEEL_POWERS.length; i++) {
             Power power = WHEEL_POWERS[i];
             double rad  = Math.toRadians(ANGLES[i]);
@@ -102,7 +96,7 @@ public class PowerWheelScreen extends Screen {
         }
     }
 
-    private void drawSegment(DrawContext ctx, int px, int py, Power power, boolean hovered, float alpha) {
+    private void drawSegment(GuiGraphicsExtractor ctx, int px, int py, Power power, boolean hovered, float alpha) {
         int x = px - SEGMENT_W / 2;
         int y = py - SEGMENT_H / 2;
 
@@ -117,10 +111,10 @@ public class PowerWheelScreen extends Screen {
 
         int nameAlpha = (int)(alpha * 255);
         int nameColor = hovered ? power.accentColor : RenderHelper.withAlpha(0xFFCCCCCC, nameAlpha);
-        ctx.drawCenteredTextWithShadow(textRenderer, power.displayName, px, py - 5, nameColor);
+        ctx.centeredText(font, power.displayName, px, py - 5, nameColor);
 
         int subAlpha = (int)(alpha * (hovered ? 180 : 115));
-        ctx.drawCenteredTextWithShadow(textRenderer, getHint(power), px, py + 5,
+        ctx.centeredText(font, getHint(power), px, py + 5,
                 RenderHelper.withAlpha(hovered ? power.accentColor : 0xFF888888, subAlpha));
     }
 
@@ -150,7 +144,6 @@ public class PowerWheelScreen extends Screen {
         return 0;
     }
 
-    // Nearest-segment hover: finds power with minimum angular distance from mouse.
     private void updateHover(int mouseX, int mouseY, int cx, int cy) {
         double dx   = mouseX - cx;
         double dy   = cy - mouseY;
@@ -170,7 +163,7 @@ public class PowerWheelScreen extends Screen {
         hoveredPower = WHEEL_POWERS[nearest];
     }
 
-    private void drawLine(DrawContext ctx, int x1, int y1, int x2, int y2, int color) {
+    private void drawLine(GuiGraphicsExtractor ctx, int x1, int y1, int x2, int y2, int color) {
         int dx = x2 - x1, dy = y2 - y1;
         int steps = Math.max(Math.abs(dx), Math.abs(dy));
         if (steps == 0) return;
@@ -186,23 +179,23 @@ public class PowerWheelScreen extends Screen {
     }
 
     @Override
-    public boolean keyReleased(KeyInput key) {
-        if (key.key() == GLFW.GLFW_KEY_R) { applySelection(); return true; }
-        return super.keyReleased(key);
+    public boolean keyReleased(KeyEvent event) {
+        if (event.key() == GLFW.GLFW_KEY_R) { applySelection(); return true; }
+        return super.keyReleased(event);
     }
 
     @Override
-    public boolean mouseClicked(Click click, boolean consumed) {
-        if (click.button() == 0 && hoveredPower != null) { applySelection(); return true; }
-        return super.mouseClicked(click, consumed);
+    public boolean mouseClicked(MouseButtonEvent event, boolean consumed) {
+        if (event.buttonInfo().button() == 0 && hoveredPower != null) { applySelection(); return true; }
+        return super.mouseClicked(event, consumed);
     }
 
     private void applySelection() {
         PowerManager.INSTANCE.setActivePower(hoveredPower != null ? hoveredPower : Power.NONE);
         CosmeticManager.INSTANCE.onPowerChanged();
-        close();
+        onClose();
     }
 
-    @Override public boolean shouldPause()      { return false; }
+    @Override public boolean isPauseScreen()      { return false; }
     @Override public boolean shouldCloseOnEsc() { return true; }
 }

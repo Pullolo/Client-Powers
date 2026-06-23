@@ -1,6 +1,6 @@
 package net.pullolo.clientpowers.module;
 
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.Minecraft;
 import net.pullolo.clientpowers.config.Config;
 
 public class ToggleSprintModule implements Module {
@@ -24,10 +24,10 @@ public class ToggleSprintModule implements Module {
     @Override
     public void tick() {
         if (!enabled) return;
-        MinecraftClient client = MinecraftClient.getInstance();
+        Minecraft client = Minecraft.getInstance();
         if (client.player == null) return;
-        if (client.options.forwardKey.isPressed() && !client.player.isSprinting()
-                && !client.player.isSneaking() && client.player.isOnGround()) {
+        if (client.options.keyUp.isDown() && !client.player.isSprinting()
+                && !client.player.isShiftKeyDown() && client.player.onGround()) {
             client.player.setSprinting(true);
         }
     }

@@ -1,13 +1,13 @@
 package net.pullolo.clientpowers.gui;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.pullolo.clientpowers.power.Power;
 
 public final class PowerHud {
     private PowerHud() {}
 
-    public static void drawPowerVignette(DrawContext ctx, int w, int h, Power power) {
+    public static void drawPowerVignette(GuiGraphicsExtractor ctx, int w, int h, Power power) {
         int depth = 22;
         int rgb = power.accentColor & 0x00FFFFFF;
         int maxAlpha = switch (power) {
@@ -42,7 +42,7 @@ public final class PowerHud {
         }
     }
 
-    public static void drawThunderSpeedLines(DrawContext ctx, int w, int h) {
+    public static void drawThunderSpeedLines(GuiGraphicsExtractor ctx, int w, int h) {
         long t  = System.currentTimeMillis();
         int  cx = w / 2;
         for (int i = 0; i < 6; i++) {
@@ -56,7 +56,7 @@ public final class PowerHud {
         }
     }
 
-    public static void drawFrostSnowflakes(DrawContext ctx, int w, int h) {
+    public static void drawFrostSnowflakes(GuiGraphicsExtractor ctx, int w, int h) {
         long t    = System.currentTimeMillis();
         int  band = w / 5;
         for (int i = 0; i < 12; i++) {
@@ -72,7 +72,7 @@ public final class PowerHud {
         }
     }
 
-    public static void drawStargazerStars(DrawContext ctx, int w, int h) {
+    public static void drawStargazerStars(GuiGraphicsExtractor ctx, int w, int h) {
         long t = System.currentTimeMillis();
         for (int i = 0; i < 30; i++) {
             int x = Math.abs((i * 73856093 + 1234567) % w);
@@ -110,7 +110,7 @@ public final class PowerHud {
         }
     }
 
-    public static void drawNatureBloom(DrawContext ctx, int w, int h) {
+    public static void drawNatureBloom(GuiGraphicsExtractor ctx, int w, int h) {
         long t = System.currentTimeMillis();
         for (int i = 0; i < 15; i++) {
             long seed  = (long) i * 137;
@@ -125,7 +125,7 @@ public final class PowerHud {
         }
     }
 
-    public static void drawShadowWisps(DrawContext ctx, int w, int h) {
+    public static void drawShadowWisps(GuiGraphicsExtractor ctx, int w, int h) {
         long t = System.currentTimeMillis();
         for (int i = 0; i < 10; i++) {
             long  seed  = (long) i * 193;
@@ -138,7 +138,7 @@ public final class PowerHud {
         }
     }
 
-    public static void drawShadowSpeedLines(DrawContext ctx, int w, int h) {
+    public static void drawShadowSpeedLines(GuiGraphicsExtractor ctx, int w, int h) {
         long t  = System.currentTimeMillis();
         int  cx = w / 2;
         for (int i = 0; i < 5; i++) {
@@ -152,7 +152,7 @@ public final class PowerHud {
         }
     }
 
-    public static void drawOceanBubbles(DrawContext ctx, int w, int h) {
+    public static void drawOceanBubbles(GuiGraphicsExtractor ctx, int w, int h) {
         long t = System.currentTimeMillis();
         for (int i = 0; i < 18; i++) {
             long  seed  = (long) i * 113;
@@ -166,7 +166,7 @@ public final class PowerHud {
         }
     }
 
-    public static void drawBloodDrips(DrawContext ctx, int w, int h) {
+    public static void drawBloodDrips(GuiGraphicsExtractor ctx, int w, int h) {
         long t = System.currentTimeMillis();
         for (int i = 0; i < 7; i++) {
             long  seed  = (long) i * 211;
@@ -180,7 +180,7 @@ public final class PowerHud {
         }
     }
 
-    public static void drawWindStreaks(DrawContext ctx, int w, int h, boolean sprinting) {
+    public static void drawWindStreaks(GuiGraphicsExtractor ctx, int w, int h, boolean sprinting) {
         long elapsed = System.currentTimeMillis();
         int count = sprinting ? 14 : 7;
         for (int i = 0; i < count; i++) {
@@ -196,7 +196,7 @@ public final class PowerHud {
         }
     }
 
-    public static void drawCrystalPrism(DrawContext ctx, int w, int h) {
+    public static void drawCrystalPrism(GuiGraphicsExtractor ctx, int w, int h) {
         long t = System.currentTimeMillis();
         for (int i = 0; i < 24; i++) {
             long seed = (long) i * 167;
@@ -214,11 +214,12 @@ public final class PowerHud {
         }
     }
 
-    public static void drawMoonPhaseHud(DrawContext ctx, int w, int h, MinecraftClient client) {
-        if (client.world == null) return;
-        int     phase    = (int)((client.world.getTimeOfDay() / 24000L) % 8L);
-        long    days     = client.world.getTimeOfDay() / 24000L;
-        long    timeOfDay = client.world.getTimeOfDay() % 24000L;
+    public static void drawMoonPhaseHud(GuiGraphicsExtractor ctx, int w, int h, Minecraft client) {
+        if (client.level == null) return;
+        long    dayTime  = client.level.getGameTime();
+        int     phase    = (int)((dayTime / 24000L) % 8L);
+        long    days     = dayTime / 24000L;
+        long    timeOfDay = dayTime % 24000L;
         boolean isNight  = timeOfDay >= 13000 && timeOfDay < 23000;
         boolean fullMoon = (phase == 0);
         long    t        = System.currentTimeMillis();
@@ -245,21 +246,21 @@ public final class PowerHud {
         }
 
         drawMoonIcon(ctx, px + 21, py + panelH / 2, 10, phase);
-        ctx.drawTextWithShadow(client.textRenderer, "Night " + days,
-                px + 39, py + 9, RenderHelper.withAlpha(0xFF000000 | accent, 200));
-        ctx.drawTextWithShadow(client.textRenderer, getMoonPhaseName(phase),
-                px + 39, py + 22, fullMoon ? 0xFFFFCC44 : 0xFFCCCCCC);
+        ctx.text(client.font, "Night " + days,
+                px + 39, py + 9, RenderHelper.withAlpha(0xFF000000 | accent, 200), false);
+        ctx.text(client.font, getMoonPhaseName(phase),
+                px + 39, py + 22, fullMoon ? 0xFFFFCC44 : 0xFFCCCCCC, false);
         if (fullMoon) {
             int wa = (int)(170 + 70 * Math.abs(Math.sin(t / 380.0)));
-            ctx.drawTextWithShadow(client.textRenderer, "!! Danger !!",
-                    px + 39, py + 36, RenderHelper.withAlpha(0xFFFF4444, wa));
+            ctx.text(client.font, "!! Danger !!",
+                    px + 39, py + 36, RenderHelper.withAlpha(0xFFFF4444, wa), false);
         } else {
-            ctx.drawTextWithShadow(client.textRenderer, isNight ? "Nighttime" : "Daytime",
-                    px + 39, py + 36, 0xFF555568);
+            ctx.text(client.font, isNight ? "Nighttime" : "Daytime",
+                    px + 39, py + 36, 0xFF555568, false);
         }
     }
 
-    private static void drawMoonIcon(DrawContext ctx, int cx, int cy, int r, int phase) {
+    private static void drawMoonIcon(GuiGraphicsExtractor ctx, int cx, int cy, int r, int phase) {
         if (phase == 4) {
             RenderHelper.drawCircleOutline(ctx, cx, cy, r, 1, 0xFF2E2E44);
             ctx.fill(cx - 1, cy - 1, cx + 2, cy + 2, 0xFF181828);
@@ -289,12 +290,12 @@ public final class PowerHud {
         };
     }
 
-    public static void drawWeatherForecast(DrawContext ctx, int w, int h, MinecraftClient client) {
-        if (client.world == null || client.player == null) return;
-        boolean raining  = client.world.isRaining();
-        boolean thunder  = client.world.isThundering();
-        float   rainGrad = client.world.getRainGradient(1.0f);
-        boolean isNight  = (client.world.getTimeOfDay() % 24000L) >= 13000;
+    public static void drawWeatherForecast(GuiGraphicsExtractor ctx, int w, int h, Minecraft client) {
+        if (client.level == null || client.player == null) return;
+        boolean raining  = client.level.isRaining();
+        boolean thunder  = client.level.isThundering();
+        float   rainGrad = client.level.getRainLevel(1.0f);
+        boolean isNight  = (client.level.getGameTime() % 24000L) >= 13000;
         long    t        = System.currentTimeMillis();
         int panelW = 152, panelH = 40, px = (w - 152) / 2, py = 5;
         int bAccent = (thunder ? Power.THUNDER.accentColor : Power.WIND.accentColor) & 0x00FFFFFF;
@@ -316,23 +317,23 @@ public final class PowerHud {
         if (thunder)      { condition = "Storm";                         condColor = Power.THUNDER.accentColor; }
         else if (raining) { condition = "Rainy";                         condColor = 0xFF7799EE; }
         else              { condition = isNight ? "Clear Night" : "Clear"; condColor = 0xFFFFDD55; }
-        ctx.drawTextWithShadow(client.textRenderer, condition, px + 49, py + 9, condColor);
+        ctx.text(client.font, condition, px + 49, py + 9, condColor, false);
 
         if (raining || thunder) {
             int barX = px + 49, barY = py + 24, barW = panelW - 60;
             ctx.fill(barX, barY, barX + barW, barY + 3, 0xFF181828);
             ctx.fill(barX, barY, barX + (int)(barW * Math.max(0, rainGrad)), barY + 3,
                     thunder ? Power.THUNDER.accentColor : 0xFF5588CC);
-            ctx.drawTextWithShadow(client.textRenderer,
+            ctx.text(client.font,
                     rainGrad > 0.85f ? "Intense" : rainGrad > 0.45f ? "Moderate" : "Building",
-                    barX, py + 29, 0xFF666688);
+                    barX, py + 29, 0xFF666688, false);
         } else {
-            ctx.drawTextWithShadow(client.textRenderer,
-                    isNight ? "Starry · No rain" : "Sunny · No rain", px + 49, py + 24, 0xFF555568);
+            ctx.text(client.font,
+                    isNight ? "Starry · No rain" : "Sunny · No rain", px + 49, py + 24, 0xFF555568, false);
         }
     }
 
-    private static void drawWeatherIcon(DrawContext ctx, int cx, int cy, boolean rain, boolean thunder, long t) {
+    private static void drawWeatherIcon(GuiGraphicsExtractor ctx, int cx, int cy, boolean rain, boolean thunder, long t) {
         if (!rain && !thunder) {
             ctx.fill(cx - 3, cy - 3, cx + 4, cy + 4, 0xFFFFDD44);
             ctx.fill(cx - 1, cy - 8, cx + 2, cy - 5, 0xFFFFDD44);
@@ -361,7 +362,7 @@ public final class PowerHud {
         }
     }
 
-    public static void drawCompassLine(DrawContext ctx, int x1, int y1, int x2, int y2, int color) {
+    public static void drawCompassLine(GuiGraphicsExtractor ctx, int x1, int y1, int x2, int y2, int color) {
         int dx = x2 - x1, dy = y2 - y1;
         int steps = Math.max(Math.abs(dx), Math.abs(dy));
         if (steps == 0) return;

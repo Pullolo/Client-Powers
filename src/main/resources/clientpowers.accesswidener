@@ -1,0 +1,6 @@
+accessWidener   v2   official
+
+accessible  field   net/minecraft/client/Minecraft  gui  Lnet/minecraft/client/gui/Gui;
+accessible  method  net/minecraft/client/gui/Gui     screen    ()Lnet/minecraft/client/gui/screens/Screen;
+accessible  method  net/minecraft/client/gui/Gui     setScreen (Lnet/minecraft/client/gui/screens/Screen;)V
+accessible  field   net/minecraft/client/renderer/state/LightmapRenderState  needsUpdate  Z

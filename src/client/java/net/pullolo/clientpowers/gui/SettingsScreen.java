@@ -1,9 +1,9 @@
 package net.pullolo.clientpowers.gui;
 
-import net.minecraft.client.gui.Click;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.network.chat.Component;
 import net.pullolo.clientpowers.config.Config;
 import net.pullolo.clientpowers.module.*;
 import net.pullolo.clientpowers.power.Power;
@@ -39,7 +39,7 @@ public class SettingsScreen extends Screen {
     private static final int ID_SPRINT = 10;
 
     public SettingsScreen() {
-        super(Text.literal("ClientPowers Settings"));
+        super(Component.literal("ClientPowers Settings"));
     }
 
     @Override
@@ -51,14 +51,13 @@ public class SettingsScreen extends Screen {
     }
 
     private int computePanelHeight() {
-        // title + sep + cosmetics(4 rows) + gap + modules(3 rows) + bottom hint
         return PADDING + 20 + PADDING + SECTION_H + 4 * ROW_H
                 + PADDING + SECTION_H + 3 * ROW_H
                 + PADDING + 4 + PADDING;
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+    public void extractRenderState(GuiGraphicsExtractor context, int mouseX, int mouseY, float delta) {
         context.fill(0, 0, width, height, 0x88000000);
 
         Power activePower = PowerManager.INSTANCE.getActivePower();
@@ -67,7 +66,7 @@ public class SettingsScreen extends Screen {
         RenderHelper.drawRoundedRect(context, panelX, panelY, PANEL_W, panelH, 10, COLOR_BG);
         RenderHelper.drawRoundedRect(context, panelX, panelY, PANEL_W, 4, 2, accent);
 
-        context.drawCenteredTextWithShadow(textRenderer, "ClientPowers",
+        context.centeredText(font, "ClientPowers",
                 panelX + PANEL_W / 2, panelY + PADDING + 2, accent);
 
         int sepY = panelY + PADDING + 16;
@@ -77,7 +76,6 @@ public class SettingsScreen extends Screen {
         int y = sepY + PADDING;
         int rowW = PANEL_W - 2 * PADDING;
 
-        // Cosmetics
         drawSectionHeader(context, "Cosmetics", panelX + PADDING, y, accent);
         y += SECTION_H;
         y = drawToggleRow(context, "Particles",     Config.INSTANCE.particlesEnabled, panelX + PADDING, y, rowW, accent, ID_PARTICLES);
@@ -87,7 +85,6 @@ public class SettingsScreen extends Screen {
 
         y += PADDING;
 
-        // Modules
         drawSectionHeader(context, "Modules", panelX + PADDING, y, accent);
         y += SECTION_H;
         y = drawToggleRowWithValue(context, "Dynamic Light", Config.INSTANCE.dynamicLightEnabled,
@@ -99,18 +96,18 @@ public class SettingsScreen extends Screen {
         drawToggleRow(context, "Toggle Sprint", Config.INSTANCE.toggleSprintEnabled,
                 panelX + PADDING, y, rowW, accent, ID_SPRINT);
 
-        context.drawCenteredTextWithShadow(textRenderer, "Press Esc to close",
+        context.centeredText(font, "Press Esc to close",
                 panelX + PANEL_W / 2, panelY + panelH - PADDING - 6, COLOR_DIM);
     }
 
-    private void drawSectionHeader(DrawContext ctx, String title, int x, int y, int accent) {
+    private void drawSectionHeader(GuiGraphicsExtractor ctx, String title, int x, int y, int accent) {
         ctx.fill(x, y + SECTION_H / 2, x + PANEL_W - 2 * PADDING, y + SECTION_H / 2 + 1, 0xFF2A2A2A);
-        RenderHelper.drawRoundedRect(ctx, x, y + 3, textRenderer.getWidth(title) + 12, SECTION_H - 6, 4, 0xFF1A1A1A);
-        ctx.drawTextWithShadow(textRenderer, title, x + 6, y + 5, accent);
+        RenderHelper.drawRoundedRect(ctx, x, y + 3, font.width(title) + 12, SECTION_H - 6, 4, 0xFF1A1A1A);
+        ctx.text(font, title, x + 6, y + 5, accent, false);
     }
 
-    private int drawToggleRow(DrawContext ctx, String label, boolean on, int x, int y, int w, int accent, int id) {
-        ctx.drawTextWithShadow(textRenderer, label, x + 4, y + (ROW_H - 8) / 2, COLOR_TEXT);
+    private int drawToggleRow(GuiGraphicsExtractor ctx, String label, boolean on, int x, int y, int w, int accent, int id) {
+        ctx.text(font, label, x + 4, y + (ROW_H - 8) / 2, COLOR_TEXT, false);
         int toggleX = x + w - 34;
         int toggleY = y + (ROW_H - 14) / 2;
         RenderHelper.drawToggle(ctx, toggleX, toggleY, on, accent);
@@ -118,45 +115,43 @@ public class SettingsScreen extends Screen {
         return y + ROW_H;
     }
 
-    private int drawToggleRowWithValue(DrawContext ctx, String label, boolean on, String value,
+    private int drawToggleRowWithValue(GuiGraphicsExtractor ctx, String label, boolean on, String value,
                                         int x, int y, int w, int accent,
                                         int toggleId, int minusId, int plusId) {
-        ctx.drawTextWithShadow(textRenderer, label, x + 4, y + (ROW_H - 8) / 2, COLOR_TEXT);
+        ctx.text(font, label, x + 4, y + (ROW_H - 8) / 2, COLOR_TEXT, false);
 
-        // Toggle on right
         int toggleX = x + w - 34;
         int toggleY = y + (ROW_H - 14) / 2;
         RenderHelper.drawToggle(ctx, toggleX, toggleY, on, accent);
         clickAreas.add(new int[]{toggleX, toggleY, 30, 14, toggleId});
 
-        // +/- buttons left of toggle with value in between
         int plusX  = toggleX - 20;
         int minusX = toggleX - 88;
         int btnY   = y + (ROW_H - 12) / 2;
 
         RenderHelper.drawRoundedRect(ctx, minusX, btnY, 14, 12, 3, 0xFF2A2A2A);
-        ctx.drawCenteredTextWithShadow(textRenderer, "-", minusX + 7, btnY + 2, COLOR_DIM);
+        ctx.centeredText(font, "-", minusX + 7, btnY + 2, COLOR_DIM);
         clickAreas.add(new int[]{minusX, btnY, 14, 12, minusId});
 
-        ctx.drawCenteredTextWithShadow(textRenderer, value, (minusX + 14 + plusX) / 2, y + (ROW_H - 8) / 2, COLOR_DIM);
+        ctx.centeredText(font, value, (minusX + 14 + plusX) / 2, y + (ROW_H - 8) / 2, COLOR_DIM);
 
         RenderHelper.drawRoundedRect(ctx, plusX, btnY, 14, 12, 3, 0xFF2A2A2A);
-        ctx.drawCenteredTextWithShadow(textRenderer, "+", plusX + 7, btnY + 2, COLOR_DIM);
+        ctx.centeredText(font, "+", plusX + 7, btnY + 2, COLOR_DIM);
         clickAreas.add(new int[]{plusX, btnY, 14, 12, plusId});
 
         return y + ROW_H;
     }
 
     @Override
-    public boolean mouseClicked(Click click, boolean consumed) {
-        int mx = (int) click.x(), my = (int) click.y();
+    public boolean mouseClicked(MouseButtonEvent event, boolean consumed) {
+        int mx = (int) event.x(), my = (int) event.y();
         for (int[] area : clickAreas) {
             if (mx >= area[0] && mx <= area[0] + area[2] && my >= area[1] && my <= area[1] + area[3]) {
                 handleAction(area[4]);
                 return true;
             }
         }
-        return super.mouseClicked(click, consumed);
+        return super.mouseClicked(event, consumed);
     }
 
     private void handleAction(int id) {
@@ -177,5 +172,5 @@ public class SettingsScreen extends Screen {
     }
 
     @Override
-    public boolean shouldPause() { return true; }
+    public boolean isPauseScreen() { return true; }
 }

@@ -1,7 +1,7 @@
 package net.pullolo.clientpowers.power;
 
-import net.minecraft.particle.ParticleEffect;
-import net.minecraft.particle.ParticleTypes;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
 
 public enum Power {
     NONE       ("None",       0xFF9B59B6, 0xFF000000),
@@ -29,7 +29,7 @@ public enum Power {
         this.auraColor   = auraColor;
     }
 
-    public ParticleEffect getBodyParticle() {
+    public ParticleOptions getBodyParticle() {
         return switch (this) {
             case FLAME      -> ParticleTypes.FLAME;
             case FROST      -> ParticleTypes.SNOWFLAKE;
@@ -48,7 +48,7 @@ public enum Power {
         };
     }
 
-    public ParticleEffect getAuraParticle() {
+    public ParticleOptions getAuraParticle() {
         return switch (this) {
             case FLAME      -> ParticleTypes.FLAME;
             case FROST      -> ParticleTypes.SNOWFLAKE;
@@ -67,7 +67,7 @@ public enum Power {
         };
     }
 
-    public ParticleEffect getEnvironmentalParticle() {
+    public ParticleOptions getEnvironmentalParticle() {
         return switch (this) {
             case FLAME      -> ParticleTypes.LARGE_SMOKE;
             case FROST      -> ParticleTypes.SNOWFLAKE;
@@ -86,7 +86,7 @@ public enum Power {
         };
     }
 
-    public ParticleEffect getHitParticle() {
+    public ParticleOptions getHitParticle() {
         return switch (this) {
             case FLAME      -> ParticleTypes.FLAME;
             case FROST      -> ParticleTypes.SNOWFLAKE;

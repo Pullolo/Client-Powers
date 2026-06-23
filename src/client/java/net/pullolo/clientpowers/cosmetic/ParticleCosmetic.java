@@ -1,7 +1,7 @@
 package net.pullolo.clientpowers.cosmetic;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.particle.ParticleEffect;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.particles.ParticleOptions;
 import net.pullolo.clientpowers.config.Config;
 import net.pullolo.clientpowers.power.Power;
 import net.pullolo.clientpowers.power.PowerManager;
@@ -12,14 +12,14 @@ public class ParticleCosmetic {
     private static final Random RANDOM = new Random();
     private int tick = 0;
 
-    public void tick(MinecraftClient client, boolean moving) {
-        if (client.player == null || client.world == null) return;
+    public void tick(Minecraft client, boolean moving) {
+        if (client.player == null || client.level == null) return;
         if (!Config.INSTANCE.particlesEnabled) return;
         if (moving) return;
 
         Power power = PowerManager.INSTANCE.getActivePower();
-        ParticleEffect body = power.getBodyParticle();
-        ParticleEffect env  = power.getEnvironmentalParticle();
+        ParticleOptions body = power.getBodyParticle();
+        ParticleOptions env  = power.getEnvironmentalParticle();
         if (body == null) return;
 
         tick++;
@@ -32,7 +32,7 @@ public class ParticleCosmetic {
         }
     }
 
-    private void spawnBodyParticles(MinecraftClient client, Power power, ParticleEffect particle) {
+    private void spawnBodyParticles(Minecraft client, Power power, ParticleOptions particle) {
         double px = client.player.getX();
         double py = client.player.getY();
         double pz = client.player.getZ();
@@ -44,11 +44,11 @@ public class ParticleCosmetic {
             double vx = (RANDOM.nextDouble() - 0.5) * 0.02;
             double vy = power == Power.VOID ? (RANDOM.nextDouble() - 0.5) * 0.02 : 0.02 + RANDOM.nextDouble() * 0.02;
             double vz = (RANDOM.nextDouble() - 0.5) * 0.02;
-            client.world.addParticleClient(particle, px + ox, py + oy, pz + oz, vx, vy, vz);
+            client.level.addParticle(particle, px + ox, py + oy, pz + oz, vx, vy, vz);
         }
     }
 
-    private void spawnEnvironmentalParticles(MinecraftClient client, ParticleEffect particle) {
+    private void spawnEnvironmentalParticles(Minecraft client, ParticleOptions particle) {
         double px = client.player.getX();
         double py = client.player.getY();
         double pz = client.player.getZ();
@@ -57,7 +57,7 @@ public class ParticleCosmetic {
             double ox = (RANDOM.nextDouble() - 0.5) * 8.0;
             double oy = RANDOM.nextDouble() * 3.0;
             double oz = (RANDOM.nextDouble() - 0.5) * 8.0;
-            client.world.addParticleClient(particle, px + ox, py + oy, pz + oz, 0, 0.01, 0);
+            client.level.addParticle(particle, px + ox, py + oy, pz + oz, 0, 0.01, 0);
         }
     }
 }

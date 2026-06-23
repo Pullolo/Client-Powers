@@ -1,26 +1,26 @@
 package net.pullolo.clientpowers.mixin.client;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.chunk.light.LightingProvider;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.lighting.LevelLightEngine;
 import net.pullolo.clientpowers.module.DynamicLightModule;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(LightingProvider.class)
+@Mixin(LevelLightEngine.class)
 public class WorldMixin {
 
-    @Inject(method = "getLight", at = @At("RETURN"), cancellable = true)
-    private void onGetLight(BlockPos pos, int ambientDarkness, CallbackInfoReturnable<Integer> cir) {
+    @Inject(method = "getRawBrightness", at = @At("RETURN"), cancellable = true)
+    private void onGetRawBrightness(BlockPos pos, int ambientDarkness, CallbackInfoReturnable<Integer> cir) {
         if (!DynamicLightModule.INSTANCE.isEnabled()) return;
 
-        MinecraftClient client = MinecraftClient.getInstance();
+        Minecraft client = Minecraft.getInstance();
         if (client == null || client.player == null) return;
-        if (!client.isOnThread()) return;
+        if (!client.isSameThread()) return;
 
-        BlockPos playerPos = client.player.getBlockPos();
+        BlockPos playerPos = client.player.blockPosition();
         int radius = DynamicLightModule.INSTANCE.getRadius();
         int dx = pos.getX() - playerPos.getX();
         int dy = pos.getY() - playerPos.getY();

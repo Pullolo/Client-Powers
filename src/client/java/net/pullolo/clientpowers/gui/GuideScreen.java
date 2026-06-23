@@ -1,9 +1,9 @@
 package net.pullolo.clientpowers.gui;
 
-import net.minecraft.client.gui.Click;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.network.chat.Component;
 import net.pullolo.clientpowers.power.Power;
 import net.pullolo.clientpowers.power.PowerManager;
 
@@ -26,7 +26,7 @@ public class GuideScreen extends Screen {
     private int   panelX, panelY, sbX, contentY;
 
     public GuideScreen() {
-        super(Text.literal("Power Guide"));
+        super(Component.literal("Power Guide"));
     }
 
     @Override
@@ -34,42 +34,37 @@ public class GuideScreen extends Screen {
         panelX   = Math.max(4, (width  - PANEL_W) / 2);
         panelY   = Math.max(4, (height - PANEL_H) / 2);
         sbX      = panelX + PADDING;
-        contentY = panelY + 28; // below title (10+2) + separator (at +24) + gap (4)
+        contentY = panelY + 28;
         Power active = PowerManager.INSTANCE.getActivePower();
         if (active != Power.NONE) selected = active;
     }
 
     @Override
-    public void render(DrawContext ctx, int mouseX, int mouseY, float delta) {
+    public void extractRenderState(GuiGraphicsExtractor ctx, int mouseX, int mouseY, float delta) {
         ctx.fill(0, 0, width, height, 0xAA000000);
 
         int accent = selected.accentColor;
-        int sbH    = POWERS.length * ROW_H; // 12 × 19 = 228
+        int sbH    = POWERS.length * ROW_H;
         int dtX    = sbX + SIDEBAR_W + 8;
-        int dtW    = PANEL_W - PADDING - SIDEBAR_W - 8 - PADDING; // 252
+        int dtW    = PANEL_W - PADDING - SIDEBAR_W - 8 - PADDING;
 
-        // Panel background + top accent bar
         RenderHelper.drawRoundedRect(ctx, panelX, panelY, PANEL_W, PANEL_H, 10, 0xF0101010);
         RenderHelper.drawRoundedRect(ctx, panelX, panelY, PANEL_W, 4, 2, accent);
 
-        // Title
-        ctx.drawCenteredTextWithShadow(textRenderer, "Power Guide",
+        ctx.centeredText(font, "Power Guide",
                 panelX + PANEL_W / 2, panelY + PADDING + 2, accent);
 
-        // Title separator
         ctx.fill(panelX + PADDING, panelY + 24, panelX + PANEL_W - PADDING, panelY + 25, 0xFF252525);
 
-        // Sidebar + detail
         hoveredIndex = -1;
         drawSidebar(ctx, mouseX, mouseY, sbH);
         drawDetail(ctx, dtX, contentY, dtW, sbH, selected);
 
-        // Footer
-        ctx.drawCenteredTextWithShadow(textRenderer, "Click a power  ·  Esc to close",
+        ctx.centeredText(font, "Click a power  ·  Esc to close",
                 panelX + PANEL_W / 2, panelY + PANEL_H - PADDING - 6, 0xFF444444);
     }
 
-    private void drawSidebar(DrawContext ctx, int mx, int my, int sbH) {
+    private void drawSidebar(GuiGraphicsExtractor ctx, int mx, int my, int sbH) {
         RenderHelper.drawRoundedRect(ctx, sbX - 2, contentY - 2, SIDEBAR_W + 4, sbH + 4, 6, 0xFF161616);
 
         for (int i = 0; i < POWERS.length; i++) {
@@ -86,66 +81,57 @@ public class GuideScreen extends Screen {
                 RenderHelper.drawRoundedRect(ctx, sbX, ry, SIDEBAR_W, ROW_H - 1, 4, 0xFF1E1E1E);
             }
 
-            // Accent dot
             ctx.fill(sbX + 6, ry + 7, sbX + 9, ry + 10,
                     sel ? p.accentColor : hov ? 0xFF888888 : 0xFF444444);
 
-            // Name
             int nc = sel ? p.accentColor : hov ? 0xFFCCCCCC : 0xFF777777;
-            ctx.drawTextWithShadow(textRenderer, p.displayName, sbX + 14, ry + 6, nc);
+            ctx.text(font, p.displayName, sbX + 14, ry + 6, nc, false);
         }
     }
 
-    private void drawDetail(DrawContext ctx, int x, int y, int w, int h, Power p) {
+    private void drawDetail(GuiGraphicsExtractor ctx, int x, int y, int w, int h, Power p) {
         RenderHelper.drawRoundedRect(ctx, x - 2, y - 2, w + 4, h + 4, 6, 0xFF161616);
-        // Top tint strip in accent color
         RenderHelper.drawRoundedRect(ctx, x, y, w, 3, 2,
                 0x60000000 | (p.accentColor & 0x00FFFFFF));
 
         int lx = x + 8;
         int ly = y + 10;
 
-        // Power name + subtitle
-        ctx.drawTextWithShadow(textRenderer, p.displayName, lx, ly, p.accentColor);
+        ctx.text(font, p.displayName, lx, ly, p.accentColor, false);
         ly += 12;
-        ctx.drawTextWithShadow(textRenderer, getHint(p), lx, ly, 0xFF777777);
+        ctx.text(font, getHint(p), lx, ly, 0xFF777777, false);
         ly += 12;
 
-        // Separator
         ctx.fill(lx, ly, x + w - 8, ly + 1, 0xFF2A2A2A);
         ly += 8;
 
-        // Description lines
         for (String line : getDesc(p)) {
-            ctx.drawTextWithShadow(textRenderer, line, lx, ly, 0xFFAAAAAA);
+            ctx.text(font, line, lx, ly, 0xFFAAAAAA, false);
             ly += 10;
         }
 
-        // Effects section
         ly += 6;
-        ctx.drawTextWithShadow(textRenderer, "Effects:", lx, ly, 0xFF666666);
+        ctx.text(font, "Effects:", lx, ly, 0xFF666666, false);
         ly += 11;
 
         for (String feat : getEffects(p)) {
             ctx.fill(lx + 2, ly + 3, lx + 4, ly + 5, p.accentColor);
-            ctx.drawTextWithShadow(textRenderer, feat, lx + 8, ly, 0xFF888888);
+            ctx.text(font, feat, lx + 8, ly, 0xFF888888, false);
             ly += 10;
         }
     }
 
     @Override
-    public boolean mouseClicked(Click click, boolean consumed) {
-        if (click.button() == 0 && hoveredIndex >= 0) {
+    public boolean mouseClicked(MouseButtonEvent event, boolean consumed) {
+        if (event.buttonInfo().button() == 0 && hoveredIndex >= 0) {
             selected = POWERS[hoveredIndex];
             return true;
         }
-        return super.mouseClicked(click, consumed);
+        return super.mouseClicked(event, consumed);
     }
 
-    @Override public boolean shouldPause()      { return true; }
+    @Override public boolean isPauseScreen()      { return true; }
     @Override public boolean shouldCloseOnEsc() { return true; }
-
-    // ── Static data ────────────────────────────────────────────────────────────
 
     private static String getHint(Power p) {
         return switch (p) {
